@@ -1,14 +1,17 @@
 # rust-musl-cross
+该文档在ubuntu16.04上亲测可用，不过openssl部分没有成功（其实是没有搞明白）。
 
-Docker images for compiling static Rust binaries using [musl-cross-make][],
-inspired by [rust-musl-builder](https://github.com/emk/rust-musl-builder)
+翻译不清楚的地方请直接查看[英文原文](https://github.com/messense/rust-musl-cross)
+
+Docker镜像，用于使用[musl cross make][]编译静态Rust二进制文件，
+参考来自[rust-musl-builder](https://github.com/emk/rust-musl-builder)
 
 [![Docker Image](https://img.shields.io/docker/pulls/messense/rust-musl-cross.svg?maxAge=2592000)](https://hub.docker.com/r/messense/rust-musl-cross/)
 [![Build Status](https://travis-ci.org/messense/rust-musl-cross.svg?branch=master)](https://travis-ci.org/messense/rust-musl-cross)
 
-## Prebuilt images
+## 预编译镜像
 
-Currently we have the following [prebuilt Docker images on Docker Hub](https://hub.docker.com/r/messense/rust-musl-cross/).
+目前我们有以下镜像 [prebuilt Docker images on Docker Hub](https://hub.docker.com/r/messense/rust-musl-cross/).
 
 | Rust toolchain | Cross Compile Target                | Docker Image Tag    |
 |----------------|-------------------------------------|---------------------|
@@ -21,37 +24,35 @@ Currently we have the following [prebuilt Docker images on Docker Hub](https://h
 | stable         | mips-unknown-linux-musl             | mips-musl           |
 | stable         | mipsel-unknown-linux-musl           | mipsel-musl         |
 
-To use `armv7-unknown-linux-musleabihf` target for example, first pull the image:
+
+例如，要使用 `armv7-unknown-linux-musleabihf` 目标，请首先pull镜像文件：
 
 ```bash
 docker pull messense/rust-musl-cross:armv7-musleabihf
 ```
 
-Then you can do:
+然后你可以：
 
 ```bash
 alias rust-musl-builder='docker run --rm -it -v "$(pwd)":/home/rust/src messense/rust-musl-cross:armv7-musleabihf'
 rust-musl-builder cargo build --release
 ```
 
-This command assumes that `$(pwd)` is readable and writable. It will output binaries in `armv7-unknown-linux-musleabihf`.
-At the moment, it doesn't attempt to cache libraries between builds, so this is best reserved for making final release builds.
+此命令假定`$（pwd）`指向的目录是可读写的，它将生成二进制文件在`armv7-unknown-linux-musleabihf`目录中。
+目前，它不会尝试在每次编译之间保持缓存，因此最好保留为生成最终relaase版本的编译。
 
-## How it works
+## 工作原理
 
-`rust-musl-cross` uses [musl-libc][], [musl-gcc][] with the help of [musl-cross-make][] to make it easy to compile, and the new
-[rustup][] `target` support.  It includes static versions of several
+`rust-musl-cross` 在 [musl-cross-make][]的帮助下使用 [musl-libc][], [musl-gcc][]  其易于编译，并支持新的 [rustup][] `target`.  它包括几个库的静态版本：
 libraries:
 
-- The standard `musl-libc` libraries.
-- OpenSSL, which is needed by many Rust applications.
+- 标准的 `musl-libc` 库.
+- OpenSSL，这是许多Rust应用程序所需要的。
 
-## Making OpenSSL work
 
-If your application uses OpenSSL, you will also need to take a few extra steps
-to make sure that it can find OpenSSL's list of trusted certificates,
-which is stored in different locations on different Linux distributions.
-You can do this using [`openssl-probe`](https://crates.io/crates/openssl-probe) as follows:
+## 使OpenSSL工作
+
+如果您的应用程序使用OpenSSL，您还需要采取一些额外的步骤来确保它能够找到OpenSSL的可信证书列表，这些证书存储在不同Linux发行版上的不同位置。您可以使用[`OpenSSL probe`]（https://crates.io/crates/OpenSSL-probe）执行此操作，如下所示：
 
 ```rust
 extern crate openssl_probe;
@@ -62,10 +63,9 @@ fn main() {
 }
 ```
 
-## Use beta/nightly Rust
+## 使用 beta/nightly 版本的Rust
 
-Currently we install stable Rust by default, if you want to switch to beta/nightly Rust, you can do it by extending
-from our Docker image, for example to use beta Rust for target `x86_64-unknown-linux-musl`:
+目前我们默认安装稳定的Rust，如果你想切换到beta/nightly 版本的Rust，你可以从我们的Docker镜像扩展，例如对target `x86_64-unknown-linux-musl` 使用beta Rust：
 
 ```dockerfile
 FROM messense/rust-musl-cross:x86_64-musl
@@ -73,9 +73,9 @@ RUN rustup update beta && \
     rustup target add --toolchain beta x86_64-unknown-linux-musl
 ```
 
-## Strip binaries
+## 瘦身二进制文件
 
-You can use the `musl-strip` command inside the image to strip binaries, for example:
+您可以在镜像中使用 `musl-strip` 命令瘦身二进制文件，例如：
 
 ```bash
 docker run --rm -it -v "$(pwd)":/home/rust/src messense/rust-musl-cross:armv7-musleabihf musl-strip /home/rust/src/target/release/example
@@ -88,4 +88,4 @@ docker run --rm -it -v "$(pwd)":/home/rust/src messense/rust-musl-cross:armv7-mu
 
 ## License
 
-Licensed under [The MIT License](./LICENSE)
+许可证在 [The MIT License](./LICENSE)
