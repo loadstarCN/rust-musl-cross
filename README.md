@@ -88,4 +88,4 @@ docker run --rm -it -v "$(pwd)":/home/rust/src messense/rust-musl-cross:armv7-mu
 
 ## License
 
-许可证在 [The MIT License](./LICENSE)
+许可证 [The MIT License](./LICENSE)
